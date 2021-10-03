@@ -39,7 +39,7 @@ function Movies() {
     setMovies(result);
   }
 
-  function navigateDetailsPage() {
+  function navigateDetailsPage(item) {
     navigation.navigate("Details", { id: item.id });
   }
 
