@@ -21,6 +21,7 @@ import Stars from "react-native-stars";
 import Genres from "../../components/Genres";
 import ModalLink from "../../components/ModalLink";
 
+import { saveMovie, hasMovie, deleteMovie } from "../../utils/storage";
 import api, { key } from "../../services/api";
 
 function Details() {
@@ -29,6 +30,7 @@ function Details() {
 
   const [movie, setMovie] = useState({});
   const [openLink, setOpenLink] = useState(false);
+  const [favoritedMovie, setFavoritedMovie] = useState(false);
 
   useEffect(() => {
     let isActive = true;
@@ -47,6 +49,9 @@ function Details() {
 
       if (isActive) {
         setMovie(res.data);
+
+        const isFavorite = await hasMovie(res.data);
+        setFavoritedMovie(isFavorite);
       }
     }
 
@@ -59,6 +64,16 @@ function Details() {
     };
   }, []);
 
+  async function handleFavoriteMovie(movie) {
+    if (favoritedMovie) {
+      await deleteMovie(movie.id);
+      setFavoritedMovie(false);
+    } else {
+      await saveMovie("@reactprime", movie);
+      setFavoritedMovie(true);
+    }
+  }
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <Container>
@@ -67,8 +82,15 @@ function Details() {
             <Feather name="arrow-left" size={28} color="#fff" />
           </HeaderButton>
 
-          <HeaderButton activeOpacity={0.8}>
-            <Ionicons name="bookmark" size={28} color="#fff" />
+          <HeaderButton
+            activeOpacity={0.8}
+            onPress={() => handleFavoriteMovie(movie)}
+          >
+            {favoritedMovie ? (
+              <Ionicons name="bookmark" size={28} color="#fff" />
+            ) : (
+              <Ionicons name="bookmark-outline" size={28} color="#fff" />
+            )}
           </HeaderButton>
         </Header>
 
